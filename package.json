@@ -1,0 +1,31 @@
+{
+  "name": "dateranger",
+  "version": "0.1.0",
+  "description": "A simple component to select dateranges, using Pikaday",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/MoOx/dateranger.git"
+  },
+  "keywords": [
+    "date",
+    "date range",
+    "daterange",
+    "date picker",
+    "datepicker"
+  ],
+  "author": "Maxime Thirouin <m@moox.io>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/MoOx/dateranger/issues"
+  },
+  "homepage": "https://github.com/MoOx/dateranger",
+  "dependencies": {
+    "pikaday": "git://github.com/MoOx/Pikaday.git",
+    "moment": "~2.5.1"
+  },
+  "devDependencies": {}
+}

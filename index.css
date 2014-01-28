@@ -1,0 +1,156 @@
+@charset "utf-8";
+
+.DateRanger {
+  position: relative;
+  color: #333;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+  .DateRanger-button {
+    font-size: .75em;
+    line-height: 1.4;
+    font-family: inherit;
+  }
+
+    .DateRanger-button-icon {
+      font-style: normal;
+    }
+
+      .DateRanger-button-icon--calendar::before {
+        content: "\1f4c5";
+        padding-right: 1em;
+      }
+
+      .DateRanger-button-icon--toggle::before {
+        content: "\25be";
+        padding-left: 1em;
+      }
+
+    .DateRanger-button-textRange {
+      display: inline-block;
+      min-width: 10em;
+    }
+
+  .DateRanger-body {
+    display: none;
+    position: absolute;
+
+    /* should be adjusted */
+    top: 1.4rem;
+
+    /* cosmetic */
+    background: #fff;
+    padding: 1rem;
+    border-radius: .1rem;
+    box-shadow: 0 0 .1rem rgba(0,0,0, .6);
+  }
+
+  .DateRanger--isOpen .DateRanger-body {
+    display: block;
+  }
+
+    .DateRanger-datepicker--range0 {
+
+    }
+
+      .DateRanger-datepicker--range0 .pika-title {
+
+      }
+
+    .DateRanger-datepicker--range1 {
+
+    }
+      .DateRanger-datepicker--range1 .pika-title {
+
+      }
+
+    .DateRanger-label {
+
+    }
+
+      .DateRanger-label-text {
+        font-size: .8em;
+        padding: 0 1em 0 0;
+      }
+
+      .DateRanger-label + .DateRanger-label {
+        padding-left: 1em;
+      }
+
+    .DateRanger-input {
+      padding: 0 .4em;
+      width: 8em;
+      text-align: center;
+    }
+
+    .DateRanger-predefined {
+      float: left;
+      width: 6em;
+      padding: 1em 0;
+    }
+
+      .DateRanger-predefined-buttons {
+
+      }
+
+        .DateRanger-predefined-button {
+          display: block;
+          text-align: center;
+          width: 100%;
+        }
+
+        .DateRanger-predefined-button + .DateRanger-predefined-button {
+          margin-top: 1em;
+        }
+
+    .DateRanger-datepickers {
+      float: left;
+    }
+
+      .DateRanger-datepickers .pika-single {
+        color: inherit;
+        background: inherit;
+        border: 0;
+      }
+
+      .DateRanger-datepickers .pika-button {
+        background: inherit;
+        border-radius: 0;
+      }
+
+    .DateRanger-actionButtons {
+      clear: both;
+    }
+
+      .DateRanger-actionButton {
+        float: right;
+        margin: 1rem 0 0;
+      }
+
+      .DateRanger-actionButton + .DateRanger-actionButton {
+        margin-right: 1em;
+      }
+
+      .DateRanger-applyButton {
+
+      }
+
+      .DateRanger-cancelButton {
+
+      }
+
+          .pika-DateRanger {}
+
+              .DateRanger-datepicker--range0 .pika-DateRanger-selection .pika-button  { background: #3af; color: #fff; }
+              .DateRanger-datepicker--range0 .pika-button:hover { background: #3af !important }
+
+              /*.DateRanger-datepicker--range1 .pika-DateRanger-selection .pika-button,*/
+              /*.DateRanger-datepicker--range1 .pika-button:hover { background: magenta; opacity: .4}*/
+
+                  .pika-DateRanger-selection--range0 .pika-button { background: #3af !important; }
+                  /*.pika-DateRanger-selection--range1 .pika-button { background: magenta !important; }*/
+
+                  /*.pika-DateRanger-selection--range0.pika-DateRanger-selection--range1 .pika-button,
+                  .pika-DateRanger--range1 .pika-DateRanger-selection--range0 .pika-button:hover {
+                      background: linear-gradient(-45deg, pink, pink 50%, magenta 50%, magenta) !important;
+                  }*/

@@ -1,0 +1,25 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Dateranger</title>
+<link rel="stylesheet" href="node_modules/Pikaday/css/pikaday.css">
+<link rel="stylesheet" href="index.css">
+<body>
+	<h1>DateRanger</h1>
+
+	<script src="node_modules/moment/moment.js"></script>
+	<script src="node_modules/Pikaday/pikaday.js"></script>
+	<script src="index.js"></script>
+	<script>
+		var dateranger = new DateRanger({
+			onChange: function(dates) {
+				alert("Dates changes: " + JSON.stringify(dates))
+			}
+		});
+		// var daterangerWithCompare = new DateRanger({
+		// 	onChange: function(dates) {
+		// 		alert("Dates changes: ", dates.toString())
+		// 	}
+		// });
+		document.body.appendChild(dateranger.el);
+	</script>
+</body>
