@@ -1,8 +1,8 @@
 /**
  * Dateranger
  *
- * It"s based on 4 (text) inputs to be able to enter them by hand.
- * It was like that at the start, & it"s still like that on touch device
+ * It's based on 4 (text) inputs to be able to enter them by hand.
+ * It was like that at the start, & it's still like that on touch device
  * because it"s not convenient to use the datepicker on touch device (well native datepicker are more convenient)
  *
  */
@@ -75,7 +75,7 @@
     }
 
   , trigger = function(el, e) {
-      console.log("trigger", e, el)
+      verbose("trigger", e, el)
       var event
       if (document.createEvent) {
         event = document.createEvent("HTMLEvents")
@@ -96,37 +96,51 @@
       }
     }
 
-  , extend = function(to, from, overwrite) {
-      var prop, hasProp
-      for (prop in from) {
-        hasProp = to[prop] !== undefined
-        if (hasProp && typeof from[prop] === "object" && from[prop].nodeName === undefined) {
-          if (isDate(from[prop])) {
-            if (overwrite) {
-                to[prop] = new Date(from[prop].getTime())
-            }
-          }
-          else if (isArray(from[prop])) {
-            if (overwrite) {
-                to[prop] = from[prop].slice(0)
-            }
-          } else {
-            to[prop] = extend({}, from[prop], overwrite)
-          }
-        } else if (overwrite || !hasProp) {
-          to[prop] = from[prop]
+  , merge = function (target, src) {
+      var array = Array.isArray(src)
+      var dst = array && [] || {}
+
+      if (target && typeof target === 'object') {
+        Object.keys(target).forEach(function (key) {
+          dst[key] = target[key]
+        })
+      }
+      Object.keys(src).forEach(function (key) {
+        if (typeof src[key] !== 'object' || !src[key]) {
+          dst[key] = src[key]
+        }
+        else {
+          // if (!target[key]) {
+            dst[key] = src[key]
+          // }
+          // else {
+          //   dst[key] = merge(target[key], src[key])
+          // }
+        }
+      })
+
+      return dst
+    }
+
+  , verbose = function() {
+      if (DateRanger.verbose && console) {
+        if (typeof console.log === 'function') {
+          console.log.apply(console, arguments);
+        }
+        // ie is weird
+        else if (console.log) {
+          console.log(arguments);
         }
       }
-
-      return to
     }
 
   , Storage = function() {
-      this.engine = window.sessionStorage
+      this.engine = window.localStorage
     }
 
   , defaults = {
-      ranges: [{
+      id: "0"
+    , ranges: [{
         label: ""
       , max: moment()
       , min: null
@@ -170,7 +184,7 @@
       //       previousPeriod: function() {
       //         if (this.getStartDate(0) && this.getEndDate(0)) {
       //           var observeDiffInDays = Math.abs(moment(this.getStartDate(0)).diff(this.getEndDate(0), "days"))
-      //           console.log("observeDiffInDays", observeDiffInDays)
+      //           verbose("observeDiffInDays", observeDiffInDays)
       //           this.setEndDate(1, moment(this.getStartDate(0)).subtract("days", 1).format(this.inputDateFormat))
       //           this.setStartDate(1, moment(this.getStartDate(0)).subtract("days", 1 + observeDiffInDays).format(this.inputDateFormat))
       //         }
@@ -238,7 +252,7 @@
       var i
         , j
 
-      this.options = extend(opts || {}, defaults, true)
+      this.options = merge(defaults, opts || {})
 
       this.storage = new this.options.Storage()
 
@@ -248,7 +262,7 @@
       this.currentMethodName  = []
       this.ranges = []
 
-      for(i = 0; i < this.options.ranges.length; i++) {
+      for (i = 0; i < this.options.ranges.length; i++) {
         this.ranges[i] = {}
         this.ranges[i].predefinedMethods = {}
         Object.keys(this.options.ranges[i].predefinedMethods).forEach(function(key) {
@@ -280,12 +294,13 @@
         this.renderDatepickers()
       }
 
-      for(i = 0; i < this.ranges.length; i++) {
-        for(j = 0; j < 2; j++) {
+      for (i = 0; i < this.ranges.length; i++) {
+        for (j = 0; j < 2; j++) {
           var dateIndex = i
           this.ranges[i].elInputs[j].addEventListener("change", function() {
-            console.log("input change", dateIndex)
+            verbose("input change", dateIndex)
             this.currentMethodName[dateIndex] = "custom"
+            this.el.classList.add("DateRanger--customRange")
           }.bind(this))
           this.ranges[i].elInputs[j].addEventListener("change", this.updateDates.bind(this))
         }
@@ -308,7 +323,7 @@
       try {
         value =  JSON.parse(value)
       }
-      catch(e) {}
+      catch (e) {}
 
       return value
     }
@@ -320,6 +335,8 @@
       this.engine.setItem("DateRanger." + key, value)
     }
   }
+
+  DateRanger.verbose = false
 
   /**
    * public DateRanger API
@@ -340,7 +357,7 @@
 
       this.el = createElement({
         tagName: "div"
-      , className: "DateRanger"
+      , className: "DateRanger DateRanger--" + this.options.id
       , childs: [this.elButton, this.elBody]
       })
     }
@@ -465,7 +482,7 @@
       })
 
       this.options.ranges.forEach(function(options, i) {
-        this.ranges[i] = extend(this.ranges[i], this.renderRange(options))
+        this.ranges[i] = merge(this.ranges[i], this.renderRange(options))
         this.elRanges.appendChild(this.ranges[i].elRange)
       }, this)
     }
@@ -480,7 +497,7 @@
       })
 
       this.elPredefinedBtns = []
-      for(i = 0; i < this.ranges.length; i++) {
+      for (i = 0; i < this.ranges.length; i++) {
         var el = createElement({
             tagName: "div"
           , className: "DateRanger-buttons"
@@ -501,7 +518,7 @@
             , rangeIndex = i
           elButton.addEventListener("click", (function() {
             this.currentMethodName[rangeIndex] = key
-            console.log("predefined for range", rangeIndex, ":", key)
+            verbose("predefined for range", rangeIndex, ":", key)
             cb()
             this.updateDates()
           }).bind(this))
@@ -558,7 +575,7 @@
       }
 
       // set
-      console.log("set", input, value)
+      verbose("set", input, value)
       if (value === null || value === "" ) {
         input.value = ""
         if (input.pikaday) {
@@ -614,14 +631,14 @@
     }
 
   , setDates: function(rangeIndex, start, end) {
-      console.log("set start date", rangeIndex, start, end)
+      verbose("set start date", rangeIndex, start, end)
       this.setStartDate(rangeIndex, start)
       this.setEndDate(rangeIndex, end !== undefined ? end : start)
 
       // switch dates if there are not setup in the right order
       // (eg copy & bad paste)
       if (this.getEndDate(rangeIndex) && moment(this.getStartDate(rangeIndex), this.htmlDateFormat).diff(moment(this.getEndDate(rangeIndex), this.htmlDateFormat)) > 0) {
-        console.log("switch", rangeIndex)
+        verbose("switch", rangeIndex)
         var switchDate = this.getEndDate(rangeIndex)
         this.setEndDate(rangeIndex, this.getStartDate(rangeIndex))
         this.setStartDate(rangeIndex, switchDate)
@@ -645,7 +662,7 @@
     // try to trigger change event to notify observers
   , triggerUpdate: function() {
       var i
-      for(i = 0; i < this.ranges.length; i++) {
+      for (i = 0; i < this.ranges.length; i++) {
         if (!(this.getStartDate(i) && this.getEndDate(i))) {
           this.addError(this.options.i18n.pleaseChooseADateRange)
           return false
@@ -658,13 +675,13 @@
       this.saveDates()
       var currentDates = JSON.stringify(this.storage.get("dates"))
       if (currentDates !== previousDates) {
-        console.log("Dates changed & saved")
-        for(i = 0; i < this.ranges.length; i++) {
-          this.storage.set("dates.method-" + i, this.currentMethodName[i])
+        verbose("Dates changed & saved")
+        for (i = 0; i < this.ranges.length; i++) {
+          this.storage.set("dates." + this.options.id + ".method-" + i, this.currentMethodName[i])
         }
 
         var dates = []
-        for(i = 0; i < this.ranges.length; i++) {
+        for (i = 0; i < this.ranges.length; i++) {
           dates.push([this.getStartDate(i), this.getEndDate(i)])
         }
 
@@ -677,18 +694,18 @@
   , updateDates: function() {
       var i
       if (this.valuesInitialized) {
-        console.log("updateDates")
+        verbose("updateDates")
         this.resetErrors()
 
-        for(i = 0; i < this.ranges.length; i++) {
+        for (i = 0; i < this.ranges.length; i++) {
           this.setDates(i, this.ranges[i].elInputs[0].value, this.ranges[i].elInputs[1].value)
         }
-        console.log("No error in the dates format, lets proceed to dates range check")
+        verbose("No error in the dates format, lets proceed to dates range check")
 
         this.updateConstraintes()
 
-        // for(i = 0; i < this.ranges.length; i++) {
-        //   console.log("Auto update others ranges if needed", i, this.isCustomRange(i))
+        // for (i = 0; i < this.ranges.length; i++) {
+        //   verbose("Auto update others ranges if needed", i, this.isCustomRange(i))
         //   if (!this.isCustomRange(i)) {
         //     this.ranges[i].predefinedMethods[this.currentMethodName[i]]()
         //   }
@@ -712,11 +729,10 @@
   , updateConstraintes: function() {
       var i
         , j
-      for(i = 0; i < this.ranges.length; i++) {
-        for(j = 0; j < 2; j++) {
+      for (i = 0; i < this.ranges.length; i++) {
+        for (j = 0; j < 2; j++) {
           var max = this.options.ranges[i].max[j]
             , min = this.options.ranges[i].min[j]
-
           max = (typeof max === "function") ? max() : max
           if (max) {
             this.ranges[i].elInputs[j].setAttribute("max", max.format(this.options.htmlDateFormat))
@@ -735,37 +751,38 @@
         }
       }
 
-      console.log("Constraints updated")
+      verbose("Constraints updated")
 
       // just copy html5 attribs as customDatepicker value, only if attributes are present
       if (this.options.customDatepicker) {
-        for(i = 0; i < this.ranges.length; i++) {
-          for(j = 0; j < 2; j++) {
+        for (i = 0; i < this.ranges.length; i++) {
+          for (j = 0; j < 2; j++) {
             this.setCustomDatepickerConstraints(i, j)
           }
         }
 
-        console.log("Constraints updated for the custom datepicker")
+        verbose("Constraints updated for the custom datepicker")
       }
     }
 
   , updateButtonState: function() {
       var i
         , j
-      for(i = 0; i < this.ranges.length; i++) {
+      for (i = 0; i < this.ranges.length; i++) {
         Object.keys(this.elPredefinedBtns[i]).forEach(function(key) {
           var el = this.elPredefinedBtns[i][key]
           el.classList.remove("DateRanger-button--selected")
           el.classList.remove("DateRanger-predefined-button--selected")
-          Object.keys(this.ranges[i].predefinedMethods).forEach(function(key) {
+          // Object.keys(this.ranges[i].predefinedMethods).forEach(function(key) {
+            console.log(el, this.currentMethodName[i], key)
             if (this.currentMethodName[i] === key) {
               el.classList.add("DateRanger-button--selected")
               el.classList.add("DateRanger-predefined-button--selected")
             }
-          }, this)
+          // }, this)
         }, this)
       }
-      console.log("Buttons states updated")
+      verbose("Buttons states updated")
     }
 
     // use first range to create a button label
@@ -796,9 +813,7 @@
     }
 
   , initializeDatepicker: function(i) {
-      var datepicker = new Pikaday(extend(this.options.datepicker, {
-        format: this.inputDateFormat
-      }, true))
+      var datepicker = new Pikaday(merge(this.options.datepicker, { format: this.inputDateFormat }))
       datepicker._o.onDraw = this.enhanceDatepickerWithVisibleRanges.bind(this, datepicker)
       datepicker.el.classList.add("DateRanger-datepicker--range" + i)
 
@@ -814,8 +829,8 @@
       , className: "DateRanger-datepickers"
       })
       // create 4 datepickers & cycle between them
-      for(i = 0; i < this.ranges.length; i++) {
-        for(j = 0; j < 2; j++) {
+      for (i = 0; i < this.ranges.length; i++) {
+        for (j = 0; j < 2; j++) {
           this.ranges[i].elInputs[j].type = "text" // remove native datepicker
           this.ranges[i].elInputs[j].pikaday = this.initializeDatepicker(i)
           this.ranges[i].elInputs[j].pikaday.hide()
@@ -826,13 +841,13 @@
       this.ranges[0].elInputs[0].pikaday.show()
       this.elBody.insertBefore(this.elDatepickers, this.elActionButtons)
 
-      for(i = 0; i < this.ranges.length; i++) {
-        for(j = 0; j < 2; j++) {
+      for (i = 0; i < this.ranges.length; i++) {
+        for (j = 0; j < 2; j++) {
           var next = {
               i: i === this.ranges.length - 1 ? (j === 1 ? 0 : i) : (j === 1 ? i + 1 : i)
             , j: j === 1 ? 0 : 1
             }
-            // console.log(i, j, next)
+            // verbose(i, j, next)
           // show next relevant picker (after syncing position)
           this.ranges[i].elInputs[j].pikaday.dateRangerInput = this.ranges[i].elInputs[j]
           this.ranges[i].elInputs[j].pikaday.dateRangerNextInput = this.ranges[next.i].elInputs[next.j]
@@ -865,8 +880,8 @@
       var i
         , j
       // hide all secondary datepickers
-      for(i = 1; i < this.ranges.length; i++) {
-        for(j = 0; j < 2; j++) {
+      for (i = 1; i < this.ranges.length; i++) {
+        for (j = 0; j < 2; j++) {
           this.ranges[i].elInputs[j].pikaday.hide()
         }
       }
@@ -882,8 +897,8 @@
         , d
         , i
         , j
-      for(i = 0; i < this.ranges.length; i++) {
-        for(j = 0; j < 2; j++) {
+      for (i = 0; i < this.ranges.length; i++) {
+        for (j = 0; j < 2; j++) {
           selectedDates.push(+this.ranges[i].elInputs[j].pikaday.getDate())
         }
       }
@@ -898,7 +913,7 @@
         }
       }
 
-      for(i = 0; i < this.ranges.length; i++) {
+      for (i = 0; i < this.ranges.length; i++) {
         if (this.ranges[i].elInputs[0].pikaday.getDate() !== null && this.ranges[i].elInputs[1].pikaday.getDate() !== null) {
           this.addDateRangeClasses(days, this.ranges[i].elInputs[0].pikaday.getDate(), this.ranges[i].elInputs[1].pikaday.getDate(), "range" + i)
         }
@@ -938,20 +953,20 @@
         , methods = []
         , methodsExists = true
 
-      for(i = 0; i < this.ranges.length; i++) {
-        methods[i] = this.storage.get("dates.method-" + i)
-        methodsExists &= methods[i]
+      for (i = 0; i < this.ranges.length; i++) {
+        methods[i] = this.storage.get("dates." + this.options.id + ".method-" + i)
+        methodsExists &= !!methods[i]
       }
         // set default if there is no values saved in the session
       if (!(savedDates && methodsExists)) {
         this.setDefaultDates()
       }
       else {
-        for(i = 0; i < this.ranges.length; i++) {
+        for (i = 0; i < this.ranges.length; i++) {
           this.currentMethodName[i] = methods[i]
 
           this.elPredefinedBtns[i][this.currentMethodName[i]].classList.add("DateRanger-button--selected")
-          savedDates = savedDates.split(",")
+          this.elPredefinedBtns[i][this.currentMethodName[i]].classList.add("DateRanger-predefined-button--selected")
 
           if (!this.isCustomRange(i)) {
             this.ranges[i].predefinedMethods[this.currentMethodName[i]]()
@@ -972,8 +987,8 @@
         , j
         , dates = {}
 
-      for(i = 0; i < this.ranges.length; i++) {
-        this.storage.set("dates.method-" + i, this.currentMethodName[i])
+      for (i = 0; i < this.ranges.length; i++) {
+        this.storage.set("dates." + this.options.id + ".method-" + i, this.currentMethodName[i])
         dates[i] = {
             0: this.getStartDate(i)
           , 1: this.getEndDate(i)
@@ -984,7 +999,7 @@
 
   , setDefaultDates: function() {
       var i
-      for(i = 0; i < this.ranges.length; i++) {
+      for (i = 0; i < this.ranges.length; i++) {
         this.currentMethodName[i] = this.options.ranges[i].preselected
         this.ranges[i].predefinedMethods[this.currentMethodName[i]]()
         this.elPredefinedBtns[i][this.currentMethodName[i]].classList.add("DateRanger-button--selected")
@@ -996,6 +1011,7 @@
     }
 
   , predefinedSelected: function() {
+      this.el.classList.remove("DateRanger--customRange")
       this.resetDatepickersState()
     }
 
