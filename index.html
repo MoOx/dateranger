@@ -4,22 +4,144 @@
 <link rel="stylesheet" href="node_modules/Pikaday/css/pikaday.css">
 <link rel="stylesheet" href="index.css">
 <body>
-	<h1>DateRanger</h1>
+  <h1>DateRanger</h1>
 
-	<script src="node_modules/moment/moment.js"></script>
-	<script src="node_modules/Pikaday/pikaday.js"></script>
-	<script src="index.js"></script>
-	<script>
-		var dateranger = new DateRanger({
-			onChange: function(dates) {
-				alert("Dates changes: " + JSON.stringify(dates))
-			}
-		});
-		// var daterangerWithCompare = new DateRanger({
-		// 	onChange: function(dates) {
-		// 		alert("Dates changes: ", dates.toString())
-		// 	}
-		// });
-		document.body.appendChild(dateranger.el);
-	</script>
+  <script src="node_modules/moment/moment.js"></script>
+  <script src="node_modules/Pikaday/pikaday.js"></script>
+  <script src="index.js"></script>
+  <script>
+    //DateRanger.verbose = true;
+    var dateranger = new DateRanger({
+      onChange: function(dates) {
+        alert("Dates changes: " + JSON.stringify(dates))
+      }
+    })
+    document.body.appendChild(dateranger.el);
+    var daterangerWithMorePredefined = new DateRanger({
+      onChange: function(dates) {
+        alert("Dates changes: ", dates.toString())
+      }
+    , id: "morepredefined"
+    , i18n: {
+        from: "From "
+      , to: "To "
+      , pleaseChooseADateRange: "Please choose a date range"
+      , invalidDate: "Invalid date"
+      , today: "Today"
+      , yesterday: "Yesterday"
+      , lastWeek: "Last Week"
+      , lastMonth: "Last Month"
+      , yearToDate: "Year to Date"
+      , previousPeriod: "Previous period"
+      , previousYear: "Previous year"
+      , custom: "Custom Range"
+      , last2Days: "Last 2 days"
+      , last7Days: "Last 7 days"
+      , last15Days: "Last 15 days"
+      , last30Days: "Last 30 days"
+      , last60Days: "Last 60 days"
+      , currentMonth: "Current month"
+      }
+    , ranges: [{
+        label: ""
+      , max: moment()
+      , min: null
+      , preselected: "currentMonth"
+      , predefinedMethods: {
+          today: function() {
+            this.setDates(0, moment().format(this.inputDateFormat))
+            this.predefinedSelected()
+            this.apply()
+          }
+        , yesterday: function() {
+            this.setDates(0, moment().subtract("days", 1).format(this.inputDateFormat))
+            this.predefinedSelected()
+            this.apply()
+          }
+        , last2Days: function() {
+            this.setDates(0, moment().format(this.inputDateFormat), moment().subtract("days", 1).format(this.inputDateFormat))
+            this.predefinedSelected()
+            this.apply()
+          }
+        , last7Days: function() {
+            this.setDates(0, moment().format(this.inputDateFormat), moment().subtract("days", 6).format(this.inputDateFormat))
+            this.predefinedSelected()
+            this.apply()
+          }
+        , last15Days: function() {
+            this.setDates(0, moment().format(this.inputDateFormat), moment().subtract("days", 14).format(this.inputDateFormat))
+            this.predefinedSelected()
+            this.apply()
+          }
+        , last30Days: function() {
+            this.setDates(0, moment().format(this.inputDateFormat), moment().subtract("days", 29).format(this.inputDateFormat))
+            this.predefinedSelected()
+            this.apply()
+          }
+        , last60Days: function() {
+            this.setDates(0, moment().format(this.inputDateFormat), moment().subtract("days", 60).format(this.inputDateFormat))
+            this.predefinedSelected()
+            this.apply()
+          }
+          // from last Monday to last Sunday
+        , currentMonth: function() {
+            // 0 = current sunday
+            this.setDates(0, moment(), moment().date(1))
+            this.predefinedSelected()
+            this.apply()
+          }
+          // from the first of last month until the last day of that month
+        , lastMonth: function() {
+            this.setDates(0, moment().subtract("months", 1).date(1), moment().date(1).subtract("days", 1))
+            this.predefinedSelected()
+            this.apply()
+          }
+        , custom: function() {
+            this.predefinedSelected()
+            this.el.classList.add("DateRanger--customRange")
+          }
+        }
+      }]
+    });
+    document.body.appendChild(daterangerWithMorePredefined.el);
+  </script>
+  <style>
+
+  .DateRanger--morepredefined {
+
+  }
+
+    .DateRanger--morepredefined .DateRanger-range-label {
+      float: left;
+    }
+
+      .DateRanger--morepredefined .DateRanger-range-label-text {
+        display: block;
+      }
+
+      .DateRanger--morepredefined .DateRanger-range-input {
+        font-size: .6rem;
+        padding: .1rem;
+        width: 4rem;
+      }
+
+    .DateRanger--morepredefined .DateRanger-datepickers { display: none }
+    .DateRanger--morepredefined.DateRanger--customRange .DateRanger-datepickers { display: block }
+
+    .DateRanger--morepredefined .DateRanger-predefined {
+      width: 10rem;
+      clear: left;
+    }
+
+    .DateRanger--morepredefined .DateRanger-actionButton {
+      float: none;
+      margin: 1rem 0;
+      width: 4.5rem;
+    }
+
+    .DateRanger--morepredefined .DateRanger-actionButton + .DateRanger-actionButton {
+      margin-right: 0;
+      margin-left: 1rem;
+    }
+  </style>
 </body>
