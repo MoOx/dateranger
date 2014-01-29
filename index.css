@@ -85,7 +85,7 @@
 
     .DateRanger-predefined {
       float: left;
-      width: 6em;
+      width: 8em;
       padding: 1em 0;
     }
 
@@ -97,10 +97,15 @@
           display: block;
           text-align: center;
           width: 100%;
+          font-size: 1rem;
         }
 
         .DateRanger-predefined-button + .DateRanger-predefined-button {
           margin-top: 1em;
+        }
+
+        .DateRanger-predefined-button--selected {
+          font-style: italic;
         }
 
     .DateRanger-datepickers {
