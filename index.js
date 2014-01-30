@@ -773,13 +773,10 @@
           var el = this.elPredefinedBtns[i][key]
           el.classList.remove("DateRanger-button--selected")
           el.classList.remove("DateRanger-predefined-button--selected")
-          // Object.keys(this.ranges[i].predefinedMethods).forEach(function(key) {
-            console.log(el, this.currentMethodName[i], key)
-            if (this.currentMethodName[i] === key) {
-              el.classList.add("DateRanger-button--selected")
-              el.classList.add("DateRanger-predefined-button--selected")
-            }
-          // }, this)
+          if (this.currentMethodName[i] === key) {
+            el.classList.add("DateRanger-button--selected")
+            el.classList.add("DateRanger-predefined-button--selected")
+          }
         }, this)
       }
       verbose("Buttons states updated")
